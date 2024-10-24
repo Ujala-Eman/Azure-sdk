@@ -1,14 +1,30 @@
 # Release History
 
-## 1.3.0-beta.1 (Unreleased)
+## 1.3.0-beta.2 (Unreleased)
 
 ### Features Added
 
-### Breaking Changes
+- Support multiple play sources for Play and Recognize
+- Support for PlayStarted event in Play/Recognize
+- Hold and Unhold the participant
+- Support to manage the rooms/servercall/group call using connect API
+- Expose original PSTN number target from incoming call event in call connection properties
+- Support for VoIP to PSTN transfer scenario
+- Added CreateCallFailed event to signify when create call API fails to establish a call
+- Added AnswerFailed event to signify when answer call API fails to answer a call
 
-### Bugs Fixed
+## 1.3.0-beta.1 (2024-08-02)
 
-### Other Changes
+### Features Added
+
+- Support multiple play sources for Play and Recognize
+- Support for PlayStarted event in Play/Recognize
+- Support for the real time transcription
+- Monetization for real-time transcription and audio streaming
+- Hold and Unhold the participant
+- Support to manage the rooms/servercall/group call using connect API
+- Expose original PSTN number target from incoming call event in call connection properties
+- Support for VoIP to PSTN transfer scenario 
 
 ## 1.2.0 (2024-04-15)
 

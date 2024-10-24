@@ -12,28 +12,34 @@ namespace Azure.Communication.CallAutomation.Tests.Infrastructure
     public class CallAutomationTestBase
     {
         protected const string ConnectionString = "endpoint=https://contoso.azure.com/;accesskey=ZHVtbXlhY2Nlc3NrZXk=";
-        protected const string DummyPayload = "{{" +
+        protected const string DummyPayload = "{" +
+                                         "\"callConnectionId\": \"someCallConnectionId\"," +
+                                         "\"serverCallId\": \"someServerCallId\"," +
+                                         "\"targets\": [" +
+                                             "{" +
+                                                 "\"rawId\": \"targetId\"," +
+                                                 "\"kind\": \"communicationUser\"," +
+                                                 "\"communicationUser\": {\"id\": \"targetId\"}" +
+                                             "}" +
+                                         "]," +
+                                         "\"sourceDisplayName\": \"displayName\"," +
+                                         "\"source\": {" +
+                                             "\"rawId\": \"sourceId\"," +
+                                             "\"kind\": \"communicationUser\"," +
+                                             "\"communicationUser\": {\"id\": \"sourceId\"}" +
+                                         "}," +
+                                         "\"callConnectionState\": \"connecting\"," +
+                                         "\"subject\": \"dummySubject\"," +
+                                         "\"callbackUri\": \"https://bot.contoso.com/callback\"" +
+                                         "}";
+
+        protected const string DummyConnectPayload = "{" +
                                         "\"callConnectionId\": \"someCallConnectionId\"," +
                                         "\"serverCallId\": \"someServerCallId\"," +
-                                        "\"targets\": [" +
-                                           "{{" +
-                                               "\"rawId\":\"targetId\"," +
-                                               "\"kind\":\"communicationUser\"," +
-                                               "\"communicationUser\":{{\"id\":\"targetId\"}}" +
-                                            "}}" +
-                                        "]," +
-                                        "\"sourceDisplayName\": \"displayName\"," +
-                                        "\"source\":{{" +
-                                                  "\"rawId\":\"sourceId\"," +
-                                                  "\"kind\":\"communicationUser\"," +
-                                                  "\"communicationUser\":{{\"id\":\"sourceId\"}}" +
-                                                            "}}," +
+                                        "\"targets\": []," +
                                         "\"callConnectionState\": \"connecting\"," +
-                                        "\"subject\": \"dummySubject\"," +
-                                        "\"callbackUri\": \"https://bot.contoso.com/callback\"," +
-                                        "\"mediaSubscriptionId\": {0}," +
-                                        "\"dataSubscriptionId\": {1}" +
-                                        "}}";
+                                        "\"callbackUri\": \"https://bot.contoso.com/callback\"" +
+                                        "}";
         protected const string SourceId = "sourceId";
         protected const string TargetId = "targetId";
         protected const string ServerCallId = "someServerCallId";
@@ -41,13 +47,7 @@ namespace Azure.Communication.CallAutomation.Tests.Infrastructure
         protected const string Subject = "dummySubject";
         protected const string CallBackUri = "https://bot.contoso.com/callback";
         protected const string DisplayName = "displayName";
-
-        private const string NoneMediaSubscriptionId = "null";
-        private const string MediaSubscriptionId = "\"mediaSubscriptionId\"";
-        private const string NoneDataSubscriptionId = "null";
-        private const string DataSubscriptionId = "\"dataSubscriptionId\"";
-        protected string CreateOrAnswerCallOrGetCallConnectionPayload = string.Format(DummyPayload, NoneMediaSubscriptionId, NoneDataSubscriptionId);
-        protected string CreateOrAnswerCallOrGetCallConnectionWithMediaSubscriptionAndTranscriptionPayload = string.Format(DummyPayload, MediaSubscriptionId, DataSubscriptionId);
+        protected static readonly CallLocator _serverCallLocator = new ServerCallLocator(ServerCallId);
 
         internal CallAutomationClient CreateMockCallAutomationClient(int responseCode, object? responseContent = null, HttpHeader[]? httpHeaders = null)
         {
@@ -92,18 +92,22 @@ namespace Azure.Communication.CallAutomation.Tests.Infrastructure
             return new CallAutomationClient(ConnectionString, callAutomationClientOptions);
         }
 
-        protected void verifyCallConnectionProperties(CallConnectionProperties callConnectionProperties)
+        protected void verifyCallConnectionProperties(CallConnectionProperties callConnectionProperties, bool isConnectApi = false)
         {
             Assert.AreEqual(CallConnectionId, callConnectionProperties.CallConnectionId);
             Assert.AreEqual(ServerCallId, callConnectionProperties.ServerCallId);
-            var sourceUser = (CommunicationUserIdentifier)callConnectionProperties.Source;
-            Assert.AreEqual(SourceId, sourceUser.Id);
-            Assert.AreEqual(callConnectionProperties.Targets.Count, 1);
-            var targetUser = (CommunicationUserIdentifier)callConnectionProperties.Targets[0];
-            Assert.AreEqual(TargetId, targetUser.Id);
+            if (!isConnectApi)
+            {
+                var sourceUser = (CommunicationUserIdentifier)callConnectionProperties.Source;
+                Assert.AreEqual(SourceId, sourceUser.Id);
+                Assert.AreEqual(callConnectionProperties.Targets.Count, 1);
+                var targetUser = (CommunicationUserIdentifier)callConnectionProperties.Targets[0];
+                Assert.AreEqual(TargetId, targetUser.Id);
+                Assert.AreEqual(DisplayName, callConnectionProperties.SourceDisplayName);
+            }
+
             Assert.AreEqual(CallConnectionState.Connecting, callConnectionProperties.CallConnectionState);
             Assert.AreEqual(CallBackUri, callConnectionProperties.CallbackUri.ToString());
-            Assert.AreEqual(DisplayName, callConnectionProperties.SourceDisplayName);
         }
     }
 }
