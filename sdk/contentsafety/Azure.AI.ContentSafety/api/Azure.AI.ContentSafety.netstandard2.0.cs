@@ -165,6 +165,7 @@ namespace Azure.AI.ContentSafety
     public partial class ContentSafetyClientOptions : Azure.Core.ClientOptions
     {
         public ContentSafetyClientOptions(Azure.AI.ContentSafety.ContentSafetyClientOptions.ServiceVersion version = Azure.AI.ContentSafety.ContentSafetyClientOptions.ServiceVersion.V2023_10_01) { }
+        public string[] AuthorizationScopes { get { throw null; } set { } }
         public enum ServiceVersion
         {
             V2023_10_01 = 1,
@@ -196,9 +197,11 @@ namespace Azure.AI.ContentSafety
     }
     public partial class ImageCategoriesAnalysis : System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.ImageCategoriesAnalysis>, System.ClientModel.Primitives.IPersistableModel<Azure.AI.ContentSafety.ImageCategoriesAnalysis>
     {
-        internal ImageCategoriesAnalysis() { }
-        public Azure.AI.ContentSafety.ImageCategory Category { get { throw null; } }
-        public int? Severity { get { throw null; } }
+        public ImageCategoriesAnalysis() { }
+        public ImageCategoriesAnalysis(Azure.AI.ContentSafety.ImageCategory category) { }
+        public ImageCategoriesAnalysis(Azure.AI.ContentSafety.ImageCategory category, int? severity, System.Collections.Generic.IDictionary<string, System.BinaryData> serializedAdditionalRawData) { }
+        public Azure.AI.ContentSafety.ImageCategory Category { get { throw null; } set { } }
+        public int? Severity { get { throw null; } set { } }
         Azure.AI.ContentSafety.ImageCategoriesAnalysis System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.ImageCategoriesAnalysis>.Create(ref System.Text.Json.Utf8JsonReader reader, System.ClientModel.Primitives.ModelReaderWriterOptions options) { throw null; }
         void System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.ImageCategoriesAnalysis>.Write(System.Text.Json.Utf8JsonWriter writer, System.ClientModel.Primitives.ModelReaderWriterOptions options) { }
         Azure.AI.ContentSafety.ImageCategoriesAnalysis System.ClientModel.Primitives.IPersistableModel<Azure.AI.ContentSafety.ImageCategoriesAnalysis>.Create(System.BinaryData data, System.ClientModel.Primitives.ModelReaderWriterOptions options) { throw null; }
@@ -272,9 +275,11 @@ namespace Azure.AI.ContentSafety
     }
     public partial class TextCategoriesAnalysis : System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.TextCategoriesAnalysis>, System.ClientModel.Primitives.IPersistableModel<Azure.AI.ContentSafety.TextCategoriesAnalysis>
     {
-        internal TextCategoriesAnalysis() { }
-        public Azure.AI.ContentSafety.TextCategory Category { get { throw null; } }
-        public int? Severity { get { throw null; } }
+        public TextCategoriesAnalysis() { }
+        public TextCategoriesAnalysis(Azure.AI.ContentSafety.TextCategory category) { }
+        public TextCategoriesAnalysis(Azure.AI.ContentSafety.TextCategory category, int? severity, System.Collections.Generic.IDictionary<string, System.BinaryData> serializedAdditionalRawData) { }
+        public Azure.AI.ContentSafety.TextCategory Category { get { throw null; } set { } }
+        public int? Severity { get { throw null; } set { } }
         Azure.AI.ContentSafety.TextCategoriesAnalysis System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.TextCategoriesAnalysis>.Create(ref System.Text.Json.Utf8JsonReader reader, System.ClientModel.Primitives.ModelReaderWriterOptions options) { throw null; }
         void System.ClientModel.Primitives.IJsonModel<Azure.AI.ContentSafety.TextCategoriesAnalysis>.Write(System.Text.Json.Utf8JsonWriter writer, System.ClientModel.Primitives.ModelReaderWriterOptions options) { }
         Azure.AI.ContentSafety.TextCategoriesAnalysis System.ClientModel.Primitives.IPersistableModel<Azure.AI.ContentSafety.TextCategoriesAnalysis>.Create(System.BinaryData data, System.ClientModel.Primitives.ModelReaderWriterOptions options) { throw null; }
