@@ -45,6 +45,12 @@ namespace Azure.ResourceManager.AppContainers
                 writer.WritePropertyName("kind"u8);
                 writer.WriteStringValue(Kind);
             }
+            if (Optional.IsDefined(Identity))
+            {
+                writer.WritePropertyName("identity"u8);
+                var serializeOptions = new JsonSerializerOptions { Converters = { new ManagedServiceIdentityTypeV3Converter() } };
+                JsonSerializer.Serialize(writer, Identity, serializeOptions);
+            }
             writer.WritePropertyName("properties"u8);
             writer.WriteStartObject();
             if (options.Format != "W" && Optional.IsDefined(ProvisioningState))
@@ -87,10 +93,30 @@ namespace Azure.ResourceManager.AppContainers
                 writer.WritePropertyName("appLogsConfiguration"u8);
                 writer.WriteObjectValue(AppLogsConfiguration, options);
             }
+            if (Optional.IsDefined(AppInsightsConfiguration))
+            {
+                writer.WritePropertyName("appInsightsConfiguration"u8);
+                writer.WriteObjectValue(AppInsightsConfiguration, options);
+            }
+            if (Optional.IsDefined(OpenTelemetryConfiguration))
+            {
+                writer.WritePropertyName("openTelemetryConfiguration"u8);
+                writer.WriteObjectValue(OpenTelemetryConfiguration, options);
+            }
             if (Optional.IsDefined(IsZoneRedundant))
             {
                 writer.WritePropertyName("zoneRedundant"u8);
                 writer.WriteBooleanValue(IsZoneRedundant.Value);
+            }
+            if (Optional.IsCollectionDefined(AvailabilityZones))
+            {
+                writer.WritePropertyName("availabilityZones"u8);
+                writer.WriteStartArray();
+                foreach (var item in AvailabilityZones)
+                {
+                    writer.WriteStringValue(item);
+                }
+                writer.WriteEndArray();
             }
             if (Optional.IsDefined(CustomDomainConfiguration))
             {
@@ -137,6 +163,21 @@ namespace Azure.ResourceManager.AppContainers
                 writer.WritePropertyName("peerTrafficConfiguration"u8);
                 writer.WriteObjectValue(PeerTrafficConfiguration, options);
             }
+            if (options.Format != "W" && Optional.IsCollectionDefined(PrivateEndpointConnections))
+            {
+                writer.WritePropertyName("privateEndpointConnections"u8);
+                writer.WriteStartArray();
+                foreach (var item in PrivateEndpointConnections)
+                {
+                    writer.WriteObjectValue(item, options);
+                }
+                writer.WriteEndArray();
+            }
+            if (Optional.IsDefined(PublicNetworkAccess))
+            {
+                writer.WritePropertyName("publicNetworkAccess"u8);
+                writer.WriteStringValue(PublicNetworkAccess.Value.ToString());
+            }
             writer.WriteEndObject();
         }
 
@@ -161,6 +202,7 @@ namespace Azure.ResourceManager.AppContainers
                 return null;
             }
             string kind = default;
+            ManagedServiceIdentity identity = default;
             IDictionary<string, string> tags = default;
             AzureLocation location = default;
             ResourceIdentifier id = default;
@@ -175,7 +217,10 @@ namespace Azure.ResourceManager.AppContainers
             string defaultDomain = default;
             IPAddress staticIP = default;
             ContainerAppLogsConfiguration appLogsConfiguration = default;
+            AppInsightsConfiguration appInsightsConfiguration = default;
+            OpenTelemetryConfiguration openTelemetryConfiguration = default;
             bool? zoneRedundant = default;
+            IList<string> availabilityZones = default;
             ContainerAppCustomDomainConfiguration customDomainConfiguration = default;
             string eventStreamEndpoint = default;
             IList<ContainerAppWorkloadProfile> workloadProfiles = default;
@@ -184,6 +229,8 @@ namespace Azure.ResourceManager.AppContainers
             string infrastructureResourceGroup = default;
             ManagedEnvironmentPropertiesPeerAuthentication peerAuthentication = default;
             ManagedEnvironmentPropertiesPeerTrafficConfiguration peerTrafficConfiguration = default;
+            IReadOnlyList<AppContainersPrivateEndpointConnectionData> privateEndpointConnections = default;
+            PublicNetworkAccess? publicNetworkAccess = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
             Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
@@ -191,6 +238,16 @@ namespace Azure.ResourceManager.AppContainers
                 if (property.NameEquals("kind"u8))
                 {
                     kind = property.Value.GetString();
+                    continue;
+                }
+                if (property.NameEquals("identity"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        continue;
+                    }
+                    var serializeOptions = new JsonSerializerOptions { Converters = { new ManagedServiceIdentityTypeV3Converter() } };
+                    identity = JsonSerializer.Deserialize<ManagedServiceIdentity>(property.Value.GetRawText(), serializeOptions);
                     continue;
                 }
                 if (property.NameEquals("tags"u8))
@@ -301,6 +358,24 @@ namespace Azure.ResourceManager.AppContainers
                             appLogsConfiguration = ContainerAppLogsConfiguration.DeserializeContainerAppLogsConfiguration(property0.Value, options);
                             continue;
                         }
+                        if (property0.NameEquals("appInsightsConfiguration"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            appInsightsConfiguration = AppInsightsConfiguration.DeserializeAppInsightsConfiguration(property0.Value, options);
+                            continue;
+                        }
+                        if (property0.NameEquals("openTelemetryConfiguration"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            openTelemetryConfiguration = OpenTelemetryConfiguration.DeserializeOpenTelemetryConfiguration(property0.Value, options);
+                            continue;
+                        }
                         if (property0.NameEquals("zoneRedundant"u8))
                         {
                             if (property0.Value.ValueKind == JsonValueKind.Null)
@@ -308,6 +383,20 @@ namespace Azure.ResourceManager.AppContainers
                                 continue;
                             }
                             zoneRedundant = property0.Value.GetBoolean();
+                            continue;
+                        }
+                        if (property0.NameEquals("availabilityZones"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            List<string> array = new List<string>();
+                            foreach (var item in property0.Value.EnumerateArray())
+                            {
+                                array.Add(item.GetString());
+                            }
+                            availabilityZones = array;
                             continue;
                         }
                         if (property0.NameEquals("customDomainConfiguration"u8))
@@ -379,6 +468,29 @@ namespace Azure.ResourceManager.AppContainers
                             peerTrafficConfiguration = ManagedEnvironmentPropertiesPeerTrafficConfiguration.DeserializeManagedEnvironmentPropertiesPeerTrafficConfiguration(property0.Value, options);
                             continue;
                         }
+                        if (property0.NameEquals("privateEndpointConnections"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            List<AppContainersPrivateEndpointConnectionData> array = new List<AppContainersPrivateEndpointConnectionData>();
+                            foreach (var item in property0.Value.EnumerateArray())
+                            {
+                                array.Add(AppContainersPrivateEndpointConnectionData.DeserializeAppContainersPrivateEndpointConnectionData(item, options));
+                            }
+                            privateEndpointConnections = array;
+                            continue;
+                        }
+                        if (property0.NameEquals("publicNetworkAccess"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            publicNetworkAccess = new PublicNetworkAccess(property0.Value.GetString());
+                            continue;
+                        }
                     }
                     continue;
                 }
@@ -396,6 +508,7 @@ namespace Azure.ResourceManager.AppContainers
                 tags ?? new ChangeTrackingDictionary<string, string>(),
                 location,
                 kind,
+                identity,
                 provisioningState,
                 daprAIInstrumentationKey,
                 daprAIConnectionString,
@@ -404,7 +517,10 @@ namespace Azure.ResourceManager.AppContainers
                 defaultDomain,
                 staticIP,
                 appLogsConfiguration,
+                appInsightsConfiguration,
+                openTelemetryConfiguration,
                 zoneRedundant,
+                availabilityZones ?? new ChangeTrackingList<string>(),
                 customDomainConfiguration,
                 eventStreamEndpoint,
                 workloadProfiles ?? new ChangeTrackingList<ContainerAppWorkloadProfile>(),
@@ -413,6 +529,8 @@ namespace Azure.ResourceManager.AppContainers
                 infrastructureResourceGroup,
                 peerAuthentication,
                 peerTrafficConfiguration,
+                privateEndpointConnections ?? new ChangeTrackingList<AppContainersPrivateEndpointConnectionData>(),
+                publicNetworkAccess,
                 serializedAdditionalRawData);
         }
 
@@ -519,6 +637,21 @@ namespace Azure.ResourceManager.AppContainers
                     {
                         builder.AppendLine($"'{Kind}'");
                     }
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(Identity), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("  identity: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(Identity))
+                {
+                    builder.Append("  identity: ");
+                    BicepSerializationHelpers.AppendChildObject(builder, Identity, options, 2, false, "  identity: ");
                 }
             }
 
@@ -706,6 +839,41 @@ namespace Azure.ResourceManager.AppContainers
                 }
             }
 
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue("AppInsightsConnectionString", out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("    appInsightsConfiguration: ");
+                builder.AppendLine("{");
+                builder.AppendLine("      appInsightsConfiguration: {");
+                builder.Append("        connectionString: ");
+                builder.AppendLine(propertyOverride);
+                builder.AppendLine("      }");
+                builder.AppendLine("    }");
+            }
+            else
+            {
+                if (Optional.IsDefined(AppInsightsConfiguration))
+                {
+                    builder.Append("    appInsightsConfiguration: ");
+                    BicepSerializationHelpers.AppendChildObject(builder, AppInsightsConfiguration, options, 4, false, "    appInsightsConfiguration: ");
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(OpenTelemetryConfiguration), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("    openTelemetryConfiguration: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(OpenTelemetryConfiguration))
+                {
+                    builder.Append("    openTelemetryConfiguration: ");
+                    BicepSerializationHelpers.AppendChildObject(builder, OpenTelemetryConfiguration, options, 4, false, "    openTelemetryConfiguration: ");
+                }
+            }
+
             hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(IsZoneRedundant), out propertyOverride);
             if (hasPropertyOverride)
             {
@@ -719,6 +887,42 @@ namespace Azure.ResourceManager.AppContainers
                     builder.Append("    zoneRedundant: ");
                     var boolValue = IsZoneRedundant.Value == true ? "true" : "false";
                     builder.AppendLine($"{boolValue}");
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(AvailabilityZones), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("    availabilityZones: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsCollectionDefined(AvailabilityZones))
+                {
+                    if (AvailabilityZones.Any())
+                    {
+                        builder.Append("    availabilityZones: ");
+                        builder.AppendLine("[");
+                        foreach (var item in AvailabilityZones)
+                        {
+                            if (item == null)
+                            {
+                                builder.Append("null");
+                                continue;
+                            }
+                            if (item.Contains(Environment.NewLine))
+                            {
+                                builder.AppendLine("      '''");
+                                builder.AppendLine($"{item}'''");
+                            }
+                            else
+                            {
+                                builder.AppendLine($"      '{item}'");
+                            }
+                        }
+                        builder.AppendLine("    ]");
+                    }
                 }
             }
 
@@ -868,7 +1072,7 @@ namespace Azure.ResourceManager.AppContainers
                 }
             }
 
-            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue("IsEnabled", out propertyOverride);
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue("IsPeerToPeerEncryptionEnabled", out propertyOverride);
             if (hasPropertyOverride)
             {
                 builder.Append("    peerTrafficConfiguration: ");
@@ -887,6 +1091,44 @@ namespace Azure.ResourceManager.AppContainers
                 {
                     builder.Append("    peerTrafficConfiguration: ");
                     BicepSerializationHelpers.AppendChildObject(builder, PeerTrafficConfiguration, options, 4, false, "    peerTrafficConfiguration: ");
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(PrivateEndpointConnections), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("    privateEndpointConnections: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsCollectionDefined(PrivateEndpointConnections))
+                {
+                    if (PrivateEndpointConnections.Any())
+                    {
+                        builder.Append("    privateEndpointConnections: ");
+                        builder.AppendLine("[");
+                        foreach (var item in PrivateEndpointConnections)
+                        {
+                            BicepSerializationHelpers.AppendChildObject(builder, item, options, 6, true, "    privateEndpointConnections: ");
+                        }
+                        builder.AppendLine("    ]");
+                    }
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(PublicNetworkAccess), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("    publicNetworkAccess: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(PublicNetworkAccess))
+                {
+                    builder.Append("    publicNetworkAccess: ");
+                    builder.AppendLine($"'{PublicNetworkAccess.Value.ToString()}'");
                 }
             }
 

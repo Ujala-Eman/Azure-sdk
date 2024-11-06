@@ -41,6 +41,16 @@ namespace Azure.ResourceManager.AppContainers.Models
                 writer.WritePropertyName("provisioningState"u8);
                 writer.WriteStringValue(ProvisioningState.Value.ToString());
             }
+            if (options.Format != "W" && Optional.IsDefined(DeploymentErrors))
+            {
+                writer.WritePropertyName("deploymentErrors"u8);
+                writer.WriteStringValue(DeploymentErrors);
+            }
+            if (Optional.IsDefined(CertificateKeyVaultProperties))
+            {
+                writer.WritePropertyName("certificateKeyVaultProperties"u8);
+                writer.WriteObjectValue(CertificateKeyVaultProperties, options);
+            }
             if (Optional.IsDefined(Password))
             {
                 writer.WritePropertyName("password"u8);
@@ -96,6 +106,11 @@ namespace Azure.ResourceManager.AppContainers.Models
                 writer.WritePropertyName("publicKeyHash"u8);
                 writer.WriteStringValue(PublicKeyHash);
             }
+            if (Optional.IsDefined(CertificateType))
+            {
+                writer.WritePropertyName("certificateType"u8);
+                writer.WriteStringValue(CertificateType.Value.ToString());
+            }
             if (options.Format != "W" && _serializedAdditionalRawData != null)
             {
                 foreach (var item in _serializedAdditionalRawData)
@@ -134,6 +149,8 @@ namespace Azure.ResourceManager.AppContainers.Models
                 return null;
             }
             ContainerAppCertificateProvisioningState? provisioningState = default;
+            string deploymentErrors = default;
+            CertificateKeyVaultProperties certificateKeyVaultProperties = default;
             string password = default;
             string subjectName = default;
             IReadOnlyList<string> subjectAlternativeNames = default;
@@ -144,6 +161,7 @@ namespace Azure.ResourceManager.AppContainers.Models
             string thumbprint = default;
             bool? valid = default;
             string publicKeyHash = default;
+            CertificateType? certificateType = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
             Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
@@ -155,6 +173,20 @@ namespace Azure.ResourceManager.AppContainers.Models
                         continue;
                     }
                     provisioningState = new ContainerAppCertificateProvisioningState(property.Value.GetString());
+                    continue;
+                }
+                if (property.NameEquals("deploymentErrors"u8))
+                {
+                    deploymentErrors = property.Value.GetString();
+                    continue;
+                }
+                if (property.NameEquals("certificateKeyVaultProperties"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        continue;
+                    }
+                    certificateKeyVaultProperties = CertificateKeyVaultProperties.DeserializeCertificateKeyVaultProperties(property.Value, options);
                     continue;
                 }
                 if (property.NameEquals("password"u8))
@@ -232,6 +264,15 @@ namespace Azure.ResourceManager.AppContainers.Models
                     publicKeyHash = property.Value.GetString();
                     continue;
                 }
+                if (property.NameEquals("certificateType"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        continue;
+                    }
+                    certificateType = new CertificateType(property.Value.GetString());
+                    continue;
+                }
                 if (options.Format != "W")
                 {
                     rawDataDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
@@ -240,6 +281,8 @@ namespace Azure.ResourceManager.AppContainers.Models
             serializedAdditionalRawData = rawDataDictionary;
             return new ContainerAppCertificateProperties(
                 provisioningState,
+                deploymentErrors,
+                certificateKeyVaultProperties,
                 password,
                 subjectName,
                 subjectAlternativeNames ?? new ChangeTrackingList<string>(),
@@ -250,6 +293,7 @@ namespace Azure.ResourceManager.AppContainers.Models
                 thumbprint,
                 valid,
                 publicKeyHash,
+                certificateType,
                 serializedAdditionalRawData);
         }
 
@@ -276,6 +320,44 @@ namespace Azure.ResourceManager.AppContainers.Models
                 {
                     builder.Append("  provisioningState: ");
                     builder.AppendLine($"'{ProvisioningState.Value.ToString()}'");
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(DeploymentErrors), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("  deploymentErrors: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(DeploymentErrors))
+                {
+                    builder.Append("  deploymentErrors: ");
+                    if (DeploymentErrors.Contains(Environment.NewLine))
+                    {
+                        builder.AppendLine("'''");
+                        builder.AppendLine($"{DeploymentErrors}'''");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"'{DeploymentErrors}'");
+                    }
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(CertificateKeyVaultProperties), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("  certificateKeyVaultProperties: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(CertificateKeyVaultProperties))
+                {
+                    builder.Append("  certificateKeyVaultProperties: ");
+                    BicepSerializationHelpers.AppendChildObject(builder, CertificateKeyVaultProperties, options, 2, false, "  certificateKeyVaultProperties: ");
                 }
             }
 
@@ -490,6 +572,21 @@ namespace Azure.ResourceManager.AppContainers.Models
                     {
                         builder.AppendLine($"'{PublicKeyHash}'");
                     }
+                }
+            }
+
+            hasPropertyOverride = hasObjectOverride && propertyOverrides.TryGetValue(nameof(CertificateType), out propertyOverride);
+            if (hasPropertyOverride)
+            {
+                builder.Append("  certificateType: ");
+                builder.AppendLine(propertyOverride);
+            }
+            else
+            {
+                if (Optional.IsDefined(CertificateType))
+                {
+                    builder.Append("  certificateType: ");
+                    builder.AppendLine($"'{CertificateType.Value.ToString()}'");
                 }
             }
 

@@ -7,8 +7,8 @@ azure-arm: true
 csharp: true
 library-name: AppContainers
 namespace: Azure.ResourceManager.AppContainers
-require: https://github.com/Azure/azure-rest-api-specs/blob/07f22664203dc215a564e00329b81a8a94cc11ee/specification/app/resource-manager/readme.md
-#tag: package-2024-03
+require: D:\azure-rest-api-specs\specification\app\resource-manager\readme.md
+# tag: package-2023-05
 output-folder: $(this-folder)/Generated
 clear-output-folder: true
 sample-gen:
@@ -89,6 +89,7 @@ rename-mapping:
   AzureActiveDirectoryValidation: ContainerAppAzureActiveDirectoryValidationConfiguration
   AzureCredentials: ContainerAppCredentials
   AzureFileProperties: ContainerAppAzureFileProperties
+  NfsAzureFileProperties: ContainerAppNfsAzureFileProperties
   BaseContainer: ContainerAppBaseContainer
   BillingMeter: ContainerAppBillingMeter
   BillingMeterProperties: ContainerAppBillingMeterProperties
@@ -228,6 +229,7 @@ rename-mapping:
   JobsCollection: ContainerAppJobsCollection
   ManagedCertificate: ContainerAppManagedCertificate
   Mtls.enabled: IsMtlsEnabled
+  ManagedEnvironmentPropertiesPeerTrafficConfigurationEncryption.enabled: IsPeerToPeerEncryptionEnabled
   ServiceBind: ContainerAppServiceBind
   JobScale: ContainerAppJobScale
   JobScale.pollingInterval: PollingIntervalInSeconds
@@ -237,6 +239,7 @@ rename-mapping:
   Usage: ContainerAppUsage
   UsageName: ContainerAppUsageName
   UsageUnit: ContainerAppUsageUnit
+  DaprSubscriptionBulkSubscribeOptions: DaprSubscriptionBulkSubscribeConfig
 
 request-path-to-resource-name:
   /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/connectedEnvironments/{connectedEnvironmentName}/certificates/{certificateName}: ContainerAppConnectedEnvironmentCertificate
