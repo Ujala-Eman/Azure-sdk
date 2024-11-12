@@ -1025,5 +1025,64 @@ namespace Azure.Communication.CallAutomation
                 throw;
             }
         }
+
+        /// <summary>
+        /// Plays a file.
+        /// </summary>
+        /// <param name="announcementOptions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Returns <see cref="InterruptAudioAndAnnounceResult"/>, which can be used to wait for Play's related events.</returns>
+        public virtual Response<InterruptAudioAndAnnounceResult> InterruptAudioAndAnnounce(InterruptAudioAndAnnounceOptions announcementOptions, CancellationToken cancellationToken = default)
+        {
+            using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(CallMedia)}.{nameof(InterruptAudioAndAnnounce)}");
+            scope.Start();
+            try
+            {
+                InterruptAudioAndAnnounceRequestInternal request = new InterruptAudioAndAnnounceRequestInternal(
+                    announcementOptions.Announcement.Select(t => TranslatePlaySourceToInternal(t)).ToList(),
+                    CommunicationIdentifierSerializer.Serialize(announcementOptions.PlayTo),
+                    announcementOptions.OperationContext);
+
+                var response = CallMediaRestClient.InterruptAudioAndAnnounce(CallConnectionId, request, cancellationToken);
+                var result = new InterruptAudioAndAnnounceResult();
+
+                result.SetEventProcessor(EventProcessor, CallConnectionId, request.OperationContext);
+                return Response.FromValue(result, response);
+            }
+            catch (Exception ex)
+            {
+                scope.Failed(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Plays a file.
+        /// </summary>
+        /// <param name="announcementOptions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Returns <see cref="InterruptAudioAndAnnounceResult"/>, which can be used to wait for Play's related events.</returns>
+        public async virtual Task<Response<InterruptAudioAndAnnounceResult>> InterruptAudioAndAnnounceAsync(InterruptAudioAndAnnounceOptions announcementOptions, CancellationToken cancellationToken = default)
+        {
+            using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(CallMedia)}.{nameof(InterruptAudioAndAnnounce)}");
+            scope.Start();
+            try
+            {
+                InterruptAudioAndAnnounceRequestInternal request = new InterruptAudioAndAnnounceRequestInternal(
+                    announcementOptions.Announcement.Select(t => TranslatePlaySourceToInternal(t)).ToList(),
+                    CommunicationIdentifierSerializer.Serialize(announcementOptions.PlayTo));
+
+                var response = await CallMediaRestClient.InterruptAudioAndAnnounceAsync(CallConnectionId, request, cancellationToken).ConfigureAwait(false);
+                var result = new InterruptAudioAndAnnounceResult();
+
+                result.SetEventProcessor(EventProcessor, CallConnectionId, request.OperationContext);
+                return Response.FromValue(result, response);
+            }
+            catch (Exception ex)
+            {
+                scope.Failed(ex);
+                throw;
+            }
+        }
     }
 }
