@@ -23,6 +23,10 @@
     </InternalsVisibleTo>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\openai-dotnet\src\OpenAI.csproj" />
+  </ItemGroup>
+
   <Choose>
     <When Condition="'$(GAServiceVersionLabel)' != ''">
       <PropertyGroup>
@@ -66,11 +70,7 @@
         <PackageReference Include="System.ClientModel" VersionOverride="$(SystemClientModelVersion)" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="OpenAI" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
 
 </Project>
